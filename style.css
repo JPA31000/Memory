@@ -1,0 +1,127 @@
+body {
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #f0f0f0;
+    margin: 0;
+}
+
+.game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.score-board {
+    background-color: #fff;
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-bottom: 25px;
+    font-size: 1.1em;
+    color: #555;
+    display: flex;
+    gap: 30px;
+    justify-content: space-around;
+    min-width: 250px;
+    text-align: center;
+}
+
+.score-board span {
+    font-weight: bold;
+    color: #333;
+}
+
+.memory-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 100px);
+    grid-template-rows: repeat(3, 100px);
+    gap: 10px;
+    perspective: 1000px; /* For 3D flip effect */
+}
+
+.card {
+    width: 100px;
+    height: 100px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+    cursor: pointer;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+
+.card.flipped, .card.matched {
+    transform: rotateY(180deg);
+}
+
+.card-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden; /* Hides the back side of the element during flip */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-radius: 8px;
+    font-size: 0.9em; /* Adjusted for better text fit */
+    padding: 5px; /* Padding for content */
+    box-sizing: border-box; /* Include padding in width/height */
+}
+
+.card-front {
+    background-color: #007bff; /* Blue similar to image */
+    color: white;
+    font-size: 1.8em;
+    font-weight: bold;
+}
+
+.card-back {
+    background-color: #e9e9e9; /* Light grey for the back */
+    color: #333;
+    transform: rotateY(180deg);
+    /* If using images, you might set background-image here */
+}
+
+.card-back img {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    border-radius: 4px; /* Optional: if images have backgrounds */
+}
+
+.card-back .placeholder-text {
+    font-size: 0.8em;
+}
+
+
+button#restart-btn {
+    background-color: #28a745; /* Green similar to image */
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    font-size: 1.1em;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 25px;
+    transition: background-color 0.3s;
+}
+
+button#restart-btn:hover {
+    background-color: #218838;
+}
+
+/* Styling for matched cards to stay flipped and visually distinct (optional) */
+.card.matched .card-back {
+    background-color: #c3e6cb; /* A light green to indicate success */
+    border: 2px solid #28a745;
+}
