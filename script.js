@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    "use strict";
     // --- ELEMENT SELECTORS ---
     const grid = document.getElementById('memory-grid');
     const pairsFoundDisplay = document.getElementById('pairs-found');
