@@ -43,7 +43,7 @@ h1 {
 .memory-grid {
     display: grid;
     grid-template-columns: repeat(4, 100px);
-    grid-template-rows: repeat(3, 100px);
+    grid-template-rows: repeat(4, 100px);
     gap: 10px;
     perspective: 1000px; /* For 3D flip effect */
 }

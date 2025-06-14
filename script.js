@@ -10,12 +10,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // For images: { type: 'image', value: 'path/to/image1.png', alt: 'Description' }
     // For text:   { type: 'text', value: 'Casque (EPI)' }
     const items = [
-        { type: 'text', value: 'Casque (EPI)' },
-        { type: 'text', value: 'Gants' },
-        { type: 'text', value: 'Bottes Séc.' },
-        { type: 'text', value: 'Harnais' },
-        { type: 'text', value: 'Lunettes Prot.' },
-        { type: 'text', value: 'Masque Resp.' }
+        { type: 'text', value: 'Architecte' },
+        { type: 'text', value: 'Géomètre' },
+        { type: 'text', value: 'Économiste' },
+        { type: 'text', value: 'Maçon' },
+        { type: 'text', value: 'Charpentier' },
+        { type: 'text', value: 'Plombier' },
+        { type: 'text', value: 'Électricien' },
+        { type: 'text', value: 'Peintre' }
     ];
     const cardContentFront = "BTP"; // Text for the front of the cards
 
