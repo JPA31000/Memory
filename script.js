@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const grid = document.getElementById('memory-grid');
     const pairsFoundDisplay = document.getElementById('pairs-found');
     const attemptsDisplay = document.getElementById('attempts');
+    const timerDisplay = document.getElementById('timer');
     const restartBtn = document.getElementById('restart-btn');
 
     // --- CARD DATA ---
@@ -27,6 +28,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let matchedPairs = 0;
     let attempts = 0;
     let canFlip = true;
+    const timeLimit = 3 * 60 * 1000; // 3 minutes in milliseconds
+    let remainingTime = timeLimit;
+    let timerInterval;
     const totalPairs = items.length;
 
     // --- FUNCTIONS ---
@@ -48,6 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
         flippedCards = [];
         canFlip = true;
         updateScore();
+        startTimer();
 
         const gameItems = [...items, ...items]; // Duplicate items for pairs
         cards = shuffle(gameItems);
@@ -122,6 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
             flippedCards = [];
             canFlip = true; // Allow flipping again
             if (matchedPairs === totalPairs) {
+                clearInterval(timerInterval);
                 setTimeout(() => alert('Félicitations ! Vous avez trouvé toutes les paires !'), 500);
             }
         } else {
@@ -145,6 +151,32 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateScore() {
         pairsFoundDisplay.textContent = matchedPairs;
         attemptsDisplay.textContent = attempts;
+    }
+
+    // Start and manage the countdown timer
+    function startTimer() {
+        clearInterval(timerInterval);
+        remainingTime = timeLimit;
+        updateTimerDisplay();
+        timerInterval = setInterval(() => {
+            remainingTime -= 1000;
+            updateTimerDisplay();
+            if (remainingTime <= 0) {
+                clearInterval(timerInterval);
+                endGame();
+            }
+        }, 1000);
+    }
+
+    function updateTimerDisplay() {
+        const minutes = Math.floor(remainingTime / 60000);
+        const seconds = Math.floor((remainingTime % 60000) / 1000);
+        timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+
+    function endGame() {
+        canFlip = false;
+        setTimeout(() => alert('Temps écoulé\u00A0! Fin de la partie.'), 100);
     }
     
     // --- EVENT LISTENERS ---
