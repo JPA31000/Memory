@@ -1,27 +1,22 @@
 document.addEventListener('DOMContentLoaded', () => {
-    "use strict";
     // --- ELEMENT SELECTORS ---
     const grid = document.getElementById('memory-grid');
     const pairsFoundDisplay = document.getElementById('pairs-found');
     const attemptsDisplay = document.getElementById('attempts');
-    const timerDisplay = document.getElementById('timer');
     const restartBtn = document.getElementById('restart-btn');
+    const timerDisplay = document.querySelector('#timer span'); // Select the timer span
 
     // --- CARD DATA ---
-    // Customize your card content here.
-    // For images: { type: 'image', value: 'path/to/image1.png', alt: 'Description' }
-    // For text:   { type: 'text', value: 'Casque (EPI)' }
+    // Les cartes sont mises à jour avec les nouveaux mots et les chemins vers vos images.
     const items = [
-        { type: 'text', value: 'Architecte' },
-        { type: 'text', value: 'Géomètre' },
-        { type: 'text', value: 'Économiste' },
-        { type: 'text', value: 'Maçon' },
-        { type: 'text', value: 'Charpentier' },
-        { type: 'text', value: 'Plombier' },
-        { type: 'text', value: 'Électricien' },
-        { type: 'text', value: 'Peintre' }
+        { text: 'Architecte', image: 'images/architecte.png' },
+        { text: 'Géomètre', image: 'images/geometre.png' },
+        { text: 'Économiste', image: 'images/economiste.png' },
+        { text: 'Maçon', image: 'images/macon.png' },
+        { text: 'Maître d\'ouvrage', image: 'images/maitre-d-ouvrage.png' },
+        { text: 'Ouvrier', image: 'images/ouvrier.png' }
     ];
-    const cardContentFront = "BTP"; // Text for the front of the cards
+    const cardContentFront = "BTP"; // Texte pour le recto des cartes
 
     // --- GAME STATE VARIABLES ---
     let cards = [];
@@ -29,14 +24,16 @@ document.addEventListener('DOMContentLoaded', () => {
     let matchedPairs = 0;
     let attempts = 0;
     let canFlip = true;
-    const timeLimit = 3 * 60 * 1000; // 3 minutes in milliseconds
-    let remainingTime = timeLimit;
-    let timerInterval;
     const totalPairs = items.length;
+
+    // --- TIMER VARIABLES ---
+    let timeElapsed = 0; // Initialize to 0 for counting up
+    let timerInterval;
+    const gameDuration = 180; // 3 minutes * 60 seconds
 
     // --- FUNCTIONS ---
 
-    // Shuffle an array (Fisher-Yates algorithm)
+    // Mélange un tableau (algorithme Fisher-Yates)
     function shuffle(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -45,24 +42,52 @@ document.addEventListener('DOMContentLoaded', () => {
         return array;
     }
 
-    // Create and display the game board
+    // Met à jour l'affichage du timer
+    function updateTimerDisplay() {
+        const minutes = Math.floor(timeElapsed / 60);
+        const seconds = timeElapsed % 60;
+        timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    // Démarre le timer
+    function startTimer() {
+        clearInterval(timerInterval); // Clear any existing timer
+        timeElapsed = 0; // Reset time to 0 for counting up
+        updateTimerDisplay();
+        timerInterval = setInterval(() => {
+            timeElapsed++; // Increment time elapsed
+            updateTimerDisplay();
+            if (timeElapsed >= gameDuration) { // Check if time has reached 3 minutes
+                clearInterval(timerInterval);
+                canFlip = false; // Disable card flipping
+                alert('Temps écoulé ! Game Over.');
+            }
+        }, 1000); // Update every second
+    }
+
+    // Arrête le timer
+    function stopTimer() {
+        clearInterval(timerInterval);
+    }
+
+    // Crée et affiche le plateau de jeu
     function createBoard() {
-        grid.innerHTML = ''; // Clear previous board
+        grid.innerHTML = ''; // Vide le plateau précédent
         matchedPairs = 0;
         attempts = 0;
         flippedCards = [];
         canFlip = true;
         updateScore();
-        startTimer();
+        startTimer(); // Start the timer when a new board is created
 
-        const gameItems = [...items, ...items]; // Duplicate items for pairs
+        const gameItems = [...items, ...items]; // Duplique les objets pour les paires
         cards = shuffle(gameItems);
 
         cards.forEach((itemData, index) => {
             const card = document.createElement('div');
             card.classList.add('card');
-            card.dataset.id = index; // Unique ID for each card element
-            card.dataset.value = itemData.value; // The actual value for matching
+            card.dataset.id = index;
+            card.dataset.value = itemData.text; // La valeur de comparaison est le texte
 
             const cardFront = document.createElement('div');
             cardFront.classList.add('card-face', 'card-front');
@@ -71,25 +96,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const cardBack = document.createElement('div');
             cardBack.classList.add('card-face', 'card-back');
 
-            if (itemData.type === 'image') {
-                const img = document.createElement('img');
-                img.src = itemData.value;
-                img.alt = itemData.alt || 'Image carte';
-                // Handle image loading errors
-                img.onerror = function() {
-                    this.style.display = 'none';
-                    const errorText = document.createElement('span');
-                    errorText.classList.add('placeholder-text');
-                    errorText.textContent = `Image ${itemData.alt || itemData.value.split('/').pop()} non trouvée`;
-                    cardBack.appendChild(errorText);
-                };
-                cardBack.appendChild(img);
-            } else { // 'text' type
-                const textSpan = document.createElement('span');
-                textSpan.classList.add('placeholder-text');
-                textSpan.textContent = itemData.value;
-                cardBack.appendChild(textSpan);
+            // Applique l'image comme fond d'écran
+            if (itemData.image) {
+                cardBack.style.backgroundImage = `url('${itemData.image}')`;
             }
+
+            // Ajoute toujours le texte par-dessus
+            const textSpan = document.createElement('span');
+            textSpan.classList.add('placeholder-text');
+            textSpan.textContent = itemData.text;
+            cardBack.appendChild(textSpan);
 
             card.appendChild(cardFront);
             card.appendChild(cardBack);
@@ -99,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Handle card click event
+    // Gère le clic sur une carte
     function flipCard(card) {
         if (!canFlip || card.classList.contains('flipped') || card.classList.contains('matched')) {
             return;
@@ -109,75 +125,49 @@ document.addEventListener('DOMContentLoaded', () => {
         flippedCards.push(card);
 
         if (flippedCards.length === 2) {
-            canFlip = false; // Prevent more flips until these are processed
+            canFlip = false;
             incrementAttempts();
             checkForMatch();
         }
     }
 
-    // Check if the two flipped cards are a match
+    // Vérifie si les deux cartes retournées correspondent
     function checkForMatch() {
         const [card1, card2] = flippedCards;
 
         if (card1.dataset.value === card2.dataset.value) {
-            // It's a match
+            // C'est une paire
             card1.classList.add('matched');
             card2.classList.add('matched');
             matchedPairs++;
             updateScore();
             flippedCards = [];
-            canFlip = true; // Allow flipping again
+            canFlip = true;
             if (matchedPairs === totalPairs) {
-                clearInterval(timerInterval);
+                stopTimer(); // Stop the timer if all pairs are found
                 setTimeout(() => alert('Félicitations ! Vous avez trouvé toutes les paires !'), 500);
             }
         } else {
-            // Not a match
+            // Ce n'est pas une paire
             setTimeout(() => {
                 card1.classList.remove('flipped');
                 card2.classList.remove('flipped');
                 flippedCards = [];
-                canFlip = true; // Allow flipping again
-            }, 1000); // Time to see the second card before it flips back
+                canFlip = true;
+            }, 1000);
         }
     }
 
-    // Increment attempts and update the display
+    // Incrémente les tentatives et met à jour l'affichage
     function incrementAttempts() {
         attempts++;
         updateScore();
     }
 
-    // Update the score display
+    // Met à jour l'affichage du score
     function updateScore() {
         pairsFoundDisplay.textContent = matchedPairs;
         attemptsDisplay.textContent = attempts;
-    }
-
-    // Start and manage the countdown timer
-    function startTimer() {
-        clearInterval(timerInterval);
-        remainingTime = timeLimit;
-        updateTimerDisplay();
-        timerInterval = setInterval(() => {
-            remainingTime -= 1000;
-            updateTimerDisplay();
-            if (remainingTime <= 0) {
-                clearInterval(timerInterval);
-                endGame();
-            }
-        }, 1000);
-    }
-
-    function updateTimerDisplay() {
-        const minutes = Math.floor(remainingTime / 60000);
-        const seconds = Math.floor((remainingTime % 60000) / 1000);
-        timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-    }
-
-    function endGame() {
-        canFlip = false;
-        setTimeout(() => alert('Temps écoulé\u00A0! Fin de la partie.'), 100);
     }
     
     // --- EVENT LISTENERS ---
